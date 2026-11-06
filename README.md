@@ -1,15 +1,14 @@
-# AtmoGraph-Team7
 # AtmoGraph – Backend Development
 
 ## 1. Overview
 
-This branch contains the backend development work for **AtmoGraph**, a graph-based global supply-chain analysis project.
+This branch contains the backend implementation for **AtmoGraph**, a graph-based global supply-chain analysis project.
 
-The backend is responsible for establishing the Neo4j database, designing the supply-chain graph structure, managing data ingestion, and providing the foundation for graph-based analysis.
+The backend establishes the Neo4j graph database, manages supply-chain entities and relationships, and provides automated data ingestion using Python.
 
 **Branch:** `Srujith-Backend`  
 **Current Phase:** Week 1 – Graph Foundations  
-**Status:** Week 1 foundation setup completed; automated data ingestion is pending.
+**Status:** Week 1 Backend Deliverables Completed
 
 ---
 
@@ -22,21 +21,22 @@ The backend is responsible for establishing the Neo4j database, designing the su
 | Cypher | Graph queries and database operations |
 | Neo4j Python Driver | Python–Neo4j connectivity |
 | python-dotenv | Environment variable management |
+| JSON | Mock supply-chain data storage |
 | Git & GitHub | Version control |
 
 ---
 
 ## 3. Week 1 – Graph Foundations
 
-### 3.1 Database Setup
+### 3.1 Neo4j Database Setup
 
 - Created a Neo4j AuraDB Free instance named `AtmoGraph`.
-- Configured the cloud database connection.
-- Verified successful database connectivity.
+- Configured cloud database connectivity.
+- Successfully verified database connectivity using Python.
 
-### 3.2 Graph Data Model
+### 3.2 Supply-Chain Graph Data Model
 
-Designed a mock global supply-chain network using five node types:
+Designed a mock global supply-chain network with five node types.
 
 | Node Label | Example Entity | ID |
 |---|---|---|
@@ -48,18 +48,20 @@ Designed a mock global supply-chain network using five node types:
 
 ### 3.3 Relationships
 
-Implemented the following directed relationships:
+Implemented four directed relationships:
 
-1. `SUPPLIES_TO` – Supplier → Factory
-2. `SHIPS_TO` – Factory → Port
-3. `TRANSPORTS_TO` – Port → Warehouse
-4. `DISTRIBUTES_TO` – Warehouse → Retailer
+| Relationship | From | To |
+|---|---|---|
+| SUPPLIES_TO | Supplier | Factory |
+| SHIPS_TO | Factory | Port |
+| TRANSPORTS_TO | Port | Warehouse |
+| DISTRIBUTES_TO | Warehouse | Retailer |
 
 Relationship properties include `lead_time_days` and, where applicable, `capacity`.
 
 ### 3.4 Database Constraints
 
-Created unique constraints to prevent duplicate entity IDs for all five node labels:
+Created unique constraints for the `id` property of all five node labels:
 
 - Supplier
 - Factory
@@ -67,26 +69,57 @@ Created unique constraints to prevent duplicate entity IDs for all five node lab
 - Warehouse
 - Retailer
 
+These constraints help prevent duplicate entities.
+
 ### 3.5 Python–Neo4j Connectivity
 
 - Installed the Neo4j Python Driver and python-dotenv.
 - Configured database credentials using a root-level `.env` file.
 - Implemented `backend/database/connection.py`.
 - Successfully connected Python to Neo4j AuraDB.
-- Verified the connection by retrieving the total node count from the database.
+- Retrieved and verified the database node count through Python.
 
-**Current database verification:** 5 nodes and 4 relationships.
+### 3.6 Automated Data Ingestion
+
+Implemented `backend/database/ingest.py` to automate the insertion of supply-chain data into Neo4j.
+
+The ingestion workflow:
+
+1. Reads mock supply-chain data from a JSON file.
+2. Processes Supplier, Factory, Port, Warehouse and Retailer records.
+3. Uses Cypher `MERGE` to match or create nodes based on unique IDs.
+4. Creates directed relationships between the corresponding nodes.
+5. Updates node and relationship properties.
+6. Executes database operations within a write transaction.
+
+### 3.7 Duplicate Prevention and Verification
+
+- Used `MERGE` to avoid duplicate nodes and relationships during repeated ingestion.
+- Tested the ingestion script multiple times.
+- Identified and corrected an extra relationship caused by inconsistent relationship-type capitalization (`Supplies_To` versus `SUPPLIES_TO`).
+- Verified the final database contains five nodes and four relationships.
+
+**Final database verification:**
+
+| Database Element | Count |
+|---|---:|
+| Nodes | 5 |
+| Relationships | 4 |
 
 ---
 
-## 4. Current Project Structure
+## 4. Project Structure
 
 ```text
 AtmoGraph-Team7/
 │
 ├── backend/
 │   ├── database/
-│   │   └── connection.py
+│   │   ├── connection.py
+│   │   └── ingest.py
+│   │
+│   ├── data/
+│   │   └── mock_supply_chain.json
 │   │
 │   └── requirements.txt
 │
@@ -95,7 +128,7 @@ AtmoGraph-Team7/
 └── README.md
 ```
 
-The actual `.env` file is stored locally and is intentionally excluded from version control.
+The actual `.env` file is stored locally and excluded from version control.
 
 ---
 
@@ -104,7 +137,7 @@ The actual `.env` file is stored locally and is intentionally excluded from vers
 ### Prerequisites
 
 - Python installed
-- A Neo4j AuraDB instance
+- Neo4j AuraDB instance
 - Git installed
 
 ### Step 1: Clone the repository
@@ -136,13 +169,17 @@ Replace the placeholder values with your own Neo4j AuraDB credentials.
 
 ### Step 4: Test database connectivity
 
-From the repository root, execute:
-
 ```bash
 python backend/database/connection.py
 ```
 
-A successful connection should display a confirmation message and the total number of nodes in the database.
+### Step 5: Run automated data ingestion
+
+```bash
+python backend/database/ingest.py
+```
+
+The script reads the mock JSON dataset and inserts or updates the corresponding nodes and relationships in Neo4j.
 
 ---
 
@@ -156,31 +193,30 @@ A successful connection should display a confirmation message and the total numb
 | Relationship creation | Completed |
 | Unique constraints | Completed |
 | Python–Neo4j connectivity | Completed |
-| Automated data ingestion scripts | Pending |
-| Ingestion validation with mock data | Pending |
+| Mock JSON dataset preparation | Completed |
+| Automated data ingestion | Completed |
+| Duplicate prevention testing | Completed |
+| Database verification | Completed |
+
+**Week 1 Backend Status: All planned deliverables completed.**
 
 ---
 
-## 7. Upcoming Backend Tasks
+## 7. Development Notes
 
-The next backend activities will focus on:
-
-- Developing automated data ingestion scripts.
-- Loading mock supply-chain data into Neo4j.
-- Handling node and relationship creation programmatically.
-- Validating the ingested graph data.
-- Preparing the database foundation for subsequent project phases.
-
----
-
-## 8. Development Notes
-
-- This README tracks backend-specific development progress on the `Srujith-Backend` branch.
+- This README tracks backend-specific development on the `Srujith-Backend` branch.
 - The main project README is maintained separately on the main branch.
-- Database credentials must always remain in local environment variables.
-- This document will be updated whenever new backend deliverables are completed.
+- Database credentials must remain in local environment variables.
+- Relationship types must follow consistent naming conventions.
+- The ingestion script uses `MERGE` to support repeated execution without creating duplicate records for the same node IDs and relationship endpoints/types.
+
+---
+
+## 8. Upcoming Backend Work
+
+The next development phases will build on this database foundation and follow the project's subsequent weekly deliverables.
 
 ---
 
 **AtmoGraph – Backend Development**  
-*Week 1: Graph Foundations*
+*Week 1: Graph Foundations – Completed*
